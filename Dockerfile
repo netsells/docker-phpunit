@@ -1,4 +1,4 @@
-FROM phpunit/phpunit
+FROM phpunit/phpunit:5.1.0
 
 MAINTAINER "Sam Jordan" <sam@netsells.co.uk>
 
