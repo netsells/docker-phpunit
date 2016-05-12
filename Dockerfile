@@ -1,21 +1,21 @@
-FROM phpunit/phpunit:5.1.0
+FROM netsells/composer
 
 MAINTAINER "Sam Jordan" <sam@netsells.co.uk>
 
-RUN apt-get update && apt-get install -y \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libmcrypt-dev \
-        libpng12-dev \
-        libmysqlclient-dev \
-        libxml2-dev \
-    && docker-php-ext-install iconv mcrypt \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install gd \
-    && docker-php-ext-install mbstring \
-    && docker-php-ext-install mysqli pdo pdo_mysql \
-    && docker-php-ext-install pcntl \
-    && docker-php-ext-install soap
+# Run some Debian packages installation.
+ENV PACKAGES="php-pear curl"
+RUN apt-get update && \
+    apt-get install -yq --no-install-recommends $PACKAGES && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Goto temporary directory.
+WORKDIR /tmp
+
+# Run composer and phpunit installation.
+RUN composer selfupdate && \
+    composer require "phpunit/phpunit:~5.0.3" --prefer-source --no-interaction && \
+    ln -s /tmp/vendor/bin/phpunit /usr/local/bin/phpunit
 
 COPY config/php.ini /usr/local/etc/php/
 
